@@ -1,6 +1,6 @@
 {
   "family": "alipay",
-  "name": "monitor-sens",
+  "name": "sensinfo",
   "version": "1.0.0",
   "description": "敏感信息监控",
   "homepage": "https://github.com/totorojs/monitor-sens",
