@@ -1,4 +1,4 @@
-# monitor-privacy
+# monitor-sens
 
 ---
 
@@ -40,6 +40,6 @@ seajs.use(["$", "sensinfo"], function($, sensinfo){
 
 ## API
 
-* scan(String source)
+### 静态方法 sensinfo.scan(String source)
 
 扫描字符串 source 中的敏感信息。
