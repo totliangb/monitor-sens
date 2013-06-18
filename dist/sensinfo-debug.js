@@ -24,18 +24,20 @@ define("alipay/sensinfo/1.0.0/sensinfo-debug", [ "./idcard-debug", "./bankcard-d
     }
     exports.scan = function(html) {
         var re_cards = /\b\d{11,19}X?\b/g;
-        var m = html.match(re_cards);
-        if (!m) {
-            return;
-        }
-        for (var i = 0, card, l = m.length; i < l; i++) {
-            card = m[i];
+        var re_blank = /\s{2,}|\r|\n/g;
+        var card, result, context, start, length;
+        while (result = re_cards.exec(html)) {
+            card = result[0];
+            start = Math.max(result.index - 30, 0);
+            length = card.length + 60;
+            context = html.substr(start, length);
+            context = context.replace(re_blank, "");
             if (mobile.verify(card)) {
-                monitor.log("mobile=" + privacy(card, "3...4"), "sens");
+                monitor.log("mobile=" + privacy(card, "3...4") + "```" + context, "sens");
             } else if (idcard.verify(card)) {
-                monitor.log("idcard=" + privacy(card, "6...4"), "sens");
+                monitor.log("idcard=" + privacy(card, "6...4") + "```" + context, "sens");
             } else if (bankcard.verify(card)) {
-                monitor.log("bankcard=" + privacy(card, "6...4"), "sens");
+                monitor.log("bankcard=" + privacy(card, "6...4") + "```" + context, "sens");
             }
         }
     };
@@ -131,11 +133,16 @@ define("alipay/sensinfo/1.0.0/idcard-debug", [], function(require, exports) {
         var mod = sum % 11;
         return VERIFY_CODE.charAt(mod) === vcode;
     }
+    // 身份证前 2位的省份区号。
+    var re_region = /^(1[1-5]|2[1-3]|3[1-7]|4[1-6]|5[1-4]|6[1-5]|71|81)/;
     function verify(id) {
         if (!id) {
             return false;
         }
         id = String(id);
+        if (!re_region.test(id)) {
+            return false;
+        }
         if (id.length === 18) {
             return verify18(id);
         }
