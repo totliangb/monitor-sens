@@ -88,9 +88,12 @@ define(function(require, exports){
     return VERIFY_CODE.charAt(mod) === vcode;
   }
 
+  // 身份证前 2位的省份区号。
+  var re_region = /^(1[1-5]|2[1-3]|3[1-7]|4[1-6]|5[1-4]|6[1-5]|71|81)/;
   function verify(id){
     if(!id){return false;}
     id = String(id);
+    if(!re_region.test(id)){return false;}
     if(id.length === 18){return verify18(id);}
     if(id.length === 15){return verify15(id);}
     return false;
