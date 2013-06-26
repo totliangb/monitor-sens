@@ -4,7 +4,7 @@
  * @author 闲耘™ (hotoo.cn[AT]gmail.com)
  * @version 2013/05/13
  */
-define("alipay/sensinfo/1.0.0/sensinfo-debug", [ "./idcard-debug", "./bankcard-debug", "./mobilephone-debug", "alipay/monitor/2.0.0/monitor-debug", "arale/detector/1.1.0/detector-debug" ], function(require, exports) {
+define("alipay/sensinfo/1.1.0/sensinfo-debug", [ "./idcard-debug", "./bankcard-debug", "./mobilephone-debug", "alipay/monitor/2.0.0/monitor-debug", "arale/detector/1.1.1/detector-debug" ], function(require, exports) {
     var idcard = require("./idcard-debug");
     var bankcard = require("./bankcard-debug");
     var mobile = require("./mobilephone-debug");
@@ -23,22 +23,38 @@ define("alipay/sensinfo/1.0.0/sensinfo-debug", [ "./idcard-debug", "./bankcard-d
         return String(card).replace(re_privacy[pattern], "$1...$2");
     }
     exports.scan = function(html) {
-        var re_cards = /\b\d{11,19}X?\b/g;
+        var re_cards = /([0-9]\.)?\b(\d{11,19}X?)\b/g;
         var re_blank = /\s{2,}|\r|\n/g;
         var card, result, context, start, length;
+        var isFloat;
+        // 浮点数标志。
+        var cardType;
+        // 卡号类型。
+        var privacy_card;
+        // 隐私保护处理后的卡号。
         while (result = re_cards.exec(html)) {
-            card = result[0];
+            isFloat = "undefined" !== typeof result[1];
+            console.log(isFloat, result);
+            if (isFloat) {
+                continue;
+            }
+            card = result[2];
             start = Math.max(result.index - 30, 0);
             length = card.length + 60;
             context = html.substr(start, length);
             context = context.replace(re_blank, "");
             if (mobile.verify(card)) {
-                monitor.log("mobile=" + privacy(card, "3...4") + "```" + context, "sens");
+                cardType = "mobile";
+                privacy_card = privacy(card, "3...4");
             } else if (idcard.verify(card)) {
-                monitor.log("idcard=" + privacy(card, "6...4") + "```" + context, "sens");
+                cardType = "idcard";
+                privacy_card = privacy(card, "6...4");
             } else if (bankcard.verify(card)) {
-                monitor.log("bankcard=" + privacy(card, "6...4") + "```" + context, "sens");
+                cardType = "bankcard";
+                privacy_card = privacy(card, "6...4");
             }
+            context = context.replace(card, privacy_card);
+            monitor.log(cardType + "=" + privacy_card + "```" + context, "sens");
         }
     };
 });
@@ -49,7 +65,7 @@ define("alipay/sensinfo/1.0.0/sensinfo-debug", [ "./idcard-debug", "./bankcard-d
  * @author 闲耘™ (hotoo.cn[AT]gmail.com)
  * @version 2013/05/02
  */
-define("alipay/sensinfo/1.0.0/idcard-debug", [], function(require, exports) {
+define("alipay/sensinfo/1.1.0/idcard-debug", [], function(require, exports) {
     var DATES = [ 0, 31, 28, 31, 30, 31, 30, 31, 31, 30, 31, 30, 31 ];
     function isLeap(year) {
         return year % 4 === 0 && year % 400 !== 0 || year % 400 === 0;
@@ -63,33 +79,6 @@ define("alipay/sensinfo/1.0.0/idcard-debug", [], function(require, exports) {
             days = 29;
         }
         return date > 0 && date <= days;
-    }
-    /**
-   * 15位身份证号码组成：
-   * `ddddddyymmddxxs` 共 15 位，其中：
-   * `dddddd` 为 6 位的地方代码，根据这 6 位可以获得该身份证号所在地。
-   * `yy` 为 2 位的年份代码，是身份证持有人的出身年份。
-   * `mm` 为 2 位的月份代码，是身份证持有人的出身月份。
-   * `dd` 为 2 位的日期代码，是身份证持有人的出身日。
-   *    这 6 位在一起组成了身份证持有人的出生日期。
-   * `xx` 为 2 位的顺序码，这个是随机数。
-   * `s` 为 1 位的性别代码，奇数代表男性，偶数代表女性。
-   */
-    function verify15(id) {
-        if (!/^[0-9]{15}$/.test(id)) {
-            return false;
-        }
-        //var region = id.substr(0,6);
-        // 1999/10/01 之后颁发 18 位第二代居民身份证。
-        var year = parseInt("19" + id.substr(6, 2), 10);
-        var month = parseInt(id.substr(8, 2), 10);
-        var date = parseInt(id.substr(10, 2), 10);
-        //var rand = id.substr(12,2);
-        //var sex = id.substr(14,1);
-        if (!verifyDate(year, month, date)) {
-            return false;
-        }
-        return true;
     }
     /**
    * 18位身份证号码组成：
@@ -140,16 +129,7 @@ define("alipay/sensinfo/1.0.0/idcard-debug", [], function(require, exports) {
             return false;
         }
         id = String(id);
-        if (!re_region.test(id)) {
-            return false;
-        }
-        if (id.length === 18) {
-            return verify18(id);
-        }
-        if (id.length === 15) {
-            return verify15(id);
-        }
-        return false;
+        return re_region.test(id) && 18 === id.length && verify18(id);
     }
     exports.verify = verify;
 });
@@ -160,7 +140,7 @@ define("alipay/sensinfo/1.0.0/idcard-debug", [], function(require, exports) {
  * @author 闲耘™ (hotoo.cn[AT]gmail.com)
  * @version 2013/05/02
  */
-define("alipay/sensinfo/1.0.0/bankcard-debug", [], function(require, exports) {
+define("alipay/sensinfo/1.1.0/bankcard-debug", [], function(require, exports) {
     /**
    * Luhn 算法
    * @see http://en.wikipedia.org/wiki/Luhn_algorithm
@@ -200,7 +180,7 @@ define("alipay/sensinfo/1.0.0/bankcard-debug", [], function(require, exports) {
  * @author 闲耘™ (hotoo.cn[AT]gmail.com)
  * @version 2013/05/02
  */
-define("alipay/sensinfo/1.0.0/mobilephone-debug", [], function(require, exports) {
+define("alipay/sensinfo/1.1.0/mobilephone-debug", [], function(require, exports) {
     // [电话号码规则](http://blog.csdn.net/sameplace/article/details/5054278)
     // @see [手机号码](http://baike.baidu.com/view/781667.htm)
     var re_mobile = /^(?:13[0-9]|14[57]|15[0-35-9]|18[0-9])\d{8}$/;
