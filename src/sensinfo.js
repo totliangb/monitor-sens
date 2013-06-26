@@ -27,23 +27,34 @@ define(function(require, exports){
   }
 
   exports.scan = function(html){
-    var re_cards = /\b\d{11,19}X?\b/g;
+    var re_cards = /([0-9]\.)?\b(\d{11,19}X?)\b/g;
     var re_blank = /\s{2,}|\r|\n/g;
     var card, result, context, start, length;
+    var isFloat; // 浮点数标志。
+    var cardType; // 卡号类型。
+    var privacy_card; // 隐私保护处理后的卡号。
 
     while(result = re_cards.exec(html)){
-      card = result[0];
+      isFloat = "undefined" !== typeof result[1];
+      console.log(isFloat, result)
+      if(isFloat){continue;}
+      card = result[2];
       start = Math.max(result.index - 30, 0);
       length = card.length + 60;
-      context = html.substr(start, length)
+      context = html.substr(start, length);
       context = context.replace(re_blank, "");
       if(mobile.verify(card)){
-        monitor.log("mobile="+privacy(card, "3...4")+"```"+context, "sens");
+        cardType = "mobile";
+        privacy_card = privacy(card, "3...4");
       }else if(idcard.verify(card)){
-        monitor.log("idcard="+privacy(card, "6...4")+"```"+context, "sens");
+        cardType = "idcard";
+        privacy_card = privacy(card, "6...4");
       }else if(bankcard.verify(card)){
-        monitor.log("bankcard="+privacy(card, "6...4")+"```"+context, "sens");
+        cardType = "bankcard";
+        privacy_card = privacy(card, "6...4");
       }
+      context = context.replace(card, privacy_card);
+      monitor.log(cardType+"="+privacy_card+"```"+context, "sens");
     }
   };
 });
