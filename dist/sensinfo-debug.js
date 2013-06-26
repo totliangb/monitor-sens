@@ -34,7 +34,6 @@ define("alipay/sensinfo/1.1.0/sensinfo-debug", [ "./idcard-debug", "./bankcard-d
         // 隐私保护处理后的卡号。
         while (result = re_cards.exec(html)) {
             isFloat = "undefined" !== typeof result[1];
-            console.log(isFloat, result);
             if (isFloat) {
                 continue;
             }
@@ -52,6 +51,8 @@ define("alipay/sensinfo/1.1.0/sensinfo-debug", [ "./idcard-debug", "./bankcard-d
             } else if (bankcard.verify(card)) {
                 cardType = "bankcard";
                 privacy_card = privacy(card, "6...4");
+            } else {
+                continue;
             }
             context = context.replace(card, privacy_card);
             monitor.log(cardType + "=" + privacy_card + "```" + context, "sens");
