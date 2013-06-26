@@ -18,34 +18,6 @@ define(function(require, exports){
     if(month === 2 && isLeap(year)){days = 29;}
     return date > 0 && date <= days;
   }
-  /**
-   * 15位身份证号码组成：
-   * `ddddddyymmddxxs` 共 15 位，其中：
-   * `dddddd` 为 6 位的地方代码，根据这 6 位可以获得该身份证号所在地。
-   * `yy` 为 2 位的年份代码，是身份证持有人的出身年份。
-   * `mm` 为 2 位的月份代码，是身份证持有人的出身月份。
-   * `dd` 为 2 位的日期代码，是身份证持有人的出身日。
-   *    这 6 位在一起组成了身份证持有人的出生日期。
-   * `xx` 为 2 位的顺序码，这个是随机数。
-   * `s` 为 1 位的性别代码，奇数代表男性，偶数代表女性。
-   */
-  function verify15(id){
-    if(!/^[0-9]{15}$/.test(id)){return false;}
-
-    //var region = id.substr(0,6);
-
-    // 1999/10/01 之后颁发 18 位第二代居民身份证。
-    var year = parseInt("19"+id.substr(6,2), 10);
-    var month = parseInt(id.substr(8,2), 10);
-    var date = parseInt(id.substr(10,2), 10);
-
-    //var rand = id.substr(12,2);
-    //var sex = id.substr(14,1);
-
-    if(!verifyDate(year, month, date)){return false;}
-
-    return true;
-  }
 
   /**
    * 18位身份证号码组成：
@@ -93,10 +65,7 @@ define(function(require, exports){
   function verify(id){
     if(!id){return false;}
     id = String(id);
-    if(!re_region.test(id)){return false;}
-    if(id.length === 18){return verify18(id);}
-    if(id.length === 15){return verify15(id);}
-    return false;
+    return re_region.test(id) && 18 === id.length && verify18(id);
   }
 
   exports.verify = verify;
