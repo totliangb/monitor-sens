@@ -9,6 +9,9 @@
   "bugs": {
     "url": "https://github.com/totorojs/monitor-sens/issues"
   },
+  "scripts": {
+    "prepublish": "make build"
+  },
   "keywords": ["utility"],
   "licenses": "MIT",
   "spm": {

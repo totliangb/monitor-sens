@@ -4,7 +4,13 @@ build-doc:
 	@nico build -C $(THEME)/nico.js
 
 publish-doc: clean build-doc
-	@spm publish --doc _site -s spmjs
+	@spm publish --doc _site -s alipay
+
+build:
+	@spm build
+
+publish: build
+	@spm publish
 
 server:
 	@nico server -C $(THEME)/nico.js
