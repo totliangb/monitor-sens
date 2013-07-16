@@ -10,7 +10,7 @@ build:
 	@spm build
 
 publish: build
-	@spm publish
+	@spm publish -s alipay
 
 server:
 	@nico server -C $(THEME)/nico.js
