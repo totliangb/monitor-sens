@@ -4,11 +4,10 @@
  * @author 闲耘™ (hotoo.cn[AT]gmail.com)
  * @version 2013/05/13
  */
-define("alipay/sensinfo/1.1.0/sensinfo-debug", [ "./idcard-debug", "./bankcard-debug", "./mobilephone-debug", "alipay/monitor/2.0.0/monitor-debug", "arale/detector/1.1.1/detector-debug" ], function(require, exports) {
+define("alipay/sensinfo/1.2.0/sensinfo-debug", [ "./idcard-debug", "./bankcard-debug", "./mobilephone-debug" ], function(require, exports) {
     var idcard = require("./idcard-debug");
     var bankcard = require("./bankcard-debug");
     var mobile = require("./mobilephone-debug");
-    var monitor = require("alipay/monitor/2.0.0/monitor-debug");
     var re_privacy = {
         "6...4": /^(.{6}).*(.{4})$/,
         "3...4": /^(.{3}).*(.{4})$/
@@ -22,7 +21,7 @@ define("alipay/sensinfo/1.1.0/sensinfo-debug", [ "./idcard-debug", "./bankcard-d
     function privacy(card, pattern) {
         return String(card).replace(re_privacy[pattern], "$1...$2");
     }
-    exports.scan = function(html) {
+    exports.scan = function(html, options) {
         var re_cards = /([0-9]\.)?\b(\d{11,19}X?)\b/g;
         var re_blank = /\s{2,}|\r|\n/g;
         var card, result, context, start, length;
@@ -55,7 +54,9 @@ define("alipay/sensinfo/1.1.0/sensinfo-debug", [ "./idcard-debug", "./bankcard-d
                 continue;
             }
             context = context.replace(card, privacy_card);
-            monitor.log(cardType + "=" + privacy_card + "```" + context, "sens");
+            if (options && options.hasOwnProperty("*") && "function" === typeof options["*"]) {
+                options["*"].call(this, cardType, privacy_card, context);
+            }
         }
     };
 });
@@ -66,7 +67,7 @@ define("alipay/sensinfo/1.1.0/sensinfo-debug", [ "./idcard-debug", "./bankcard-d
  * @author 闲耘™ (hotoo.cn[AT]gmail.com)
  * @version 2013/05/02
  */
-define("alipay/sensinfo/1.1.0/idcard-debug", [], function(require, exports) {
+define("alipay/sensinfo/1.2.0/idcard-debug", [], function(require, exports) {
     var DATES = [ 0, 31, 28, 31, 30, 31, 30, 31, 31, 30, 31, 30, 31 ];
     function isLeap(year) {
         return year % 4 === 0 && year % 400 !== 0 || year % 400 === 0;
@@ -141,7 +142,7 @@ define("alipay/sensinfo/1.1.0/idcard-debug", [], function(require, exports) {
  * @author 闲耘™ (hotoo.cn[AT]gmail.com)
  * @version 2013/05/02
  */
-define("alipay/sensinfo/1.1.0/bankcard-debug", [], function(require, exports) {
+define("alipay/sensinfo/1.2.0/bankcard-debug", [], function(require, exports) {
     /**
    * Luhn 算法
    * @see http://en.wikipedia.org/wiki/Luhn_algorithm
@@ -181,7 +182,7 @@ define("alipay/sensinfo/1.1.0/bankcard-debug", [], function(require, exports) {
  * @author 闲耘™ (hotoo.cn[AT]gmail.com)
  * @version 2013/05/02
  */
-define("alipay/sensinfo/1.1.0/mobilephone-debug", [], function(require, exports) {
+define("alipay/sensinfo/1.2.0/mobilephone-debug", [], function(require, exports) {
     // [电话号码规则](http://blog.csdn.net/sameplace/article/details/5054278)
     // @see [手机号码](http://baike.baidu.com/view/781667.htm)
     var re_mobile = /^(?:13[0-9]|14[57]|15[0-35-9]|18[0-9])\d{8}$/;
