@@ -1,7 +1,7 @@
 {
   "family": "alipay",
   "name": "sensinfo",
-  "version": "1.1.0",
+  "version": "1.2.0",
   "description": "敏感信息监控",
   "homepage": "https://github.com/totorojs/monitor-sens",
   "author": "",
@@ -14,7 +14,6 @@
   "spm": {
     "output": ["sensinfo.js"],
     "alias": {
-      "monitor": "alipay/monitor/2.0.0/monitor"
     },
     "devAlias": {},
     "engines": {}

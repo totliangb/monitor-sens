@@ -12,7 +12,7 @@
 
 
 ````javascript
-seajs.use(["jquery", "monitor", "sensinfo"], function($, monitor, sensinfo){
+seajs.use(["jquery", "alipay/monitor/2.1.0/monitor", "sensinfo"], function($, monitor, sensinfo){
 
   // 命中率：[0,1]: 实际对应采样率：[0%,100%]
   var rate = 0.8;
@@ -34,7 +34,11 @@ seajs.use(["jquery", "monitor", "sensinfo"], function($, monitor, sensinfo){
   $(function(){
     try{
       var html = (document.documentElement || document.body).innerHTML;
-      sensinfo.scan(html);
+      sensinfo.scan(html, {
+        "*": function(cardType, privacy_card, context){
+          monitor.log(cardType+"="+privacy_card+"```"+context, "sens");
+        }
+      });
     }catch(ex){}
   });
 

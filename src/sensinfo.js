@@ -9,7 +9,6 @@ define(function(require, exports){
   var idcard = require("./idcard");
   var bankcard = require("./bankcard");
   var mobile = require("./mobilephone");
-  var monitor = require("monitor");
 
   var re_privacy = {
     "6...4": /^(.{6}).*(.{4})$/,
@@ -26,7 +25,7 @@ define(function(require, exports){
     return String(card).replace(re_privacy[pattern], "$1...$2");
   }
 
-  exports.scan = function(html){
+  exports.scan = function(html, options){
     var re_cards = /([0-9]\.)?\b(\d{11,19}X?)\b/g;
     var re_blank = /\s{2,}|\r|\n/g;
     var card, result, context, start, length;
@@ -55,7 +54,10 @@ define(function(require, exports){
         continue;
       }
       context = context.replace(card, privacy_card);
-      monitor.log(cardType+"="+privacy_card+"```"+context, "sens");
+      if(options && options.hasOwnProperty("*") &&
+          "function"===typeof options["*"]){
+        options["*"].call(this, cardType, privacy_card, context);
+      }
     }
   };
 });
