@@ -1,6 +1,6 @@
 define(function(require) {
 
-  var IDCard = require('../src/idcard');
+  var IDCard = require('idcard');
   var expect = require("expect");
 
   describe('IDCard', function() {
