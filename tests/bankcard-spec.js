@@ -1,6 +1,6 @@
 define(function(require) {
 
-  var BankCard = require('../src/bankcard');
+  var BankCard = require('bankcard');
   var expect = require("expect");
 
   describe('BankCard', function() {

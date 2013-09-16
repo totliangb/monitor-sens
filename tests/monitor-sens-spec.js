@@ -1,6 +1,6 @@
 define(function(require) {
 
-  var monitor-privacy = require('../src/monitor-privacy');
+  require('monitor-privacy');
 
   describe('monitor-privacy', function() {
 
