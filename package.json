@@ -4,8 +4,15 @@
   "version": "1.2.0",
   "description": "敏感信息监控",
   "homepage": "https://github.com/totorojs/monitor-sens",
-  "author": "",
-  "repository": "https://github.com/totorojs/monitor-sens.git",
+  "author": "冒顿 <hotoo.cn@gmail.com>",
+  "maintainers": [
+    "冒顿 <hotoo.cn@gmail.com>",
+    "乔花 <qiaohua@alibaba-inc.com>"
+  ],
+  "repository": {
+    "type": "git",
+    "url": "https://github.com/totorojs/monitor-sens.git"
+  },
   "bugs": {
     "url": "https://github.com/totorojs/monitor-sens/issues"
   },
