@@ -9,7 +9,7 @@ publish-doc: clean build-doc
 build:
 	@spm build
 
-publish: build
+publish:
 	@spm publish -s alipay
 
 server:
